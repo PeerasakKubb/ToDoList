@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="th">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>Student Life Optimizer — AI Assistant</title>
+
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+	<style>
+		:root{
+			--bg-1:#071022; --bg-2:#051227;
+			--glass: rgba(255,255,255,0.04);
+			--muted:#9aa7b9;
+			--accentA:#7c6cff; --accentB:#2dd4bf;
+			--danger:#ff6b6b; --ok:#34d399; --info:#60a5fa;
+			--card-radius:14px; --maxw:1260px;
+		}
+		*{box-sizing:border-box}
+		html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var(--bg-2));color:#e9f2ff;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial; -webkit-font-smoothing:antialiased;}
+		body{display:flex;align-items:center;justify-content:center;padding:36px}
+
+		.container{ width:min(96%,var(--maxw)); display:grid; gap:24px; align-items:start }
+
+		/* HERO */
+		.hero{
+			display:grid; grid-template-columns: 1fr 360px; gap:20px; align-items:center;
+			padding:28px; border-radius:20px;
+			background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+			box-shadow: 0 30px 80px rgba(3,7,18,0.6); border:1px solid rgba(255,255,255,0.04);
+		}
+		@media (max-width:980px){ .hero{ grid-template-columns: 1fr; } .hero-right{order:2} }
+
+		.h-title{ font-family:'Playfair Display', serif; font-size:2rem; margin:0 0 8px 0; letter-spacing:-0.6px; color:#fff; }
+		.h-sub{ margin:0 0 12px 0; color:var(--muted); font-size:0.95rem; max-width:64ch; }
+
+		.cta-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+		.btn{ padding:10px 14px; border-radius:12px; border:none; font-weight:700; cursor:pointer;
+			background:linear-gradient(90deg,var(--accentA), #9b7bff); color:white; box-shadow: 0 10px 30px rgba(124,108,255,0.14);
+			transition: transform .12s ease, box-shadow .12s ease; }
+		.btn.secondary{ background:transparent; border:1px solid rgba(255,255,255,0.05); color:var(--muted); font-weight:600; }
+		.btn.ghost{ background:transparent; color:var(--muted); border:1px dashed rgba(255,255,255,0.03); }
+
+		.hero-right{ display:flex; flex-direction:column; gap:12px; align-items:end; justify-self:end }
+		.stat{ width:100%; padding:14px; border-radius:12px; text-align:center; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03) }
+		.stat h3{ margin:0; font-size:1.25rem } .stat p{ margin:6px 0 0 0; color:var(--muted); font-size:0.85rem }
+
+		/* grid content */
+		.grid{ display:grid; grid-template-columns: 1fr 380px; gap:20px; align-items:start; }
+		@media (max-width:980px){ .grid{ grid-template-columns:1fr } }
+
+		.card{ padding:16px; border-radius:14px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); box-shadow: 0 18px 48px rgba(2,6,23,0.45); }
+		.card h2{ margin:0 0 12px 0; font-size:1.05rem; color:#fff; display:flex; gap:10px; align-items:center; }
+		.h-icon{ width:42px; height:42px; border-radius:10px; display:grid; place-items:center; background:linear-gradient(90deg,var(--accentA),var(--accentB)); box-shadow:0 8px 26px rgba(0,0,0,0.3) }
+
+		/* modern form */
+		form{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+		.input{
+			padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02); color:#fff; min-width:140px;
+		}
+		.help{ font-size:0.85rem; color:var(--muted); margin-top:8px }
+
+		/* lists */
+		.list{ margin-top:12px; display:flex; flex-direction:column; gap:10px }
+		.list-item{ padding:12px; border-radius:10px; display:flex; justify-content:space-between; gap:12px; align-items:center; background:rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.03); transition: transform .12s ease; }
+		.list-item:hover{ transform: translateY(-6px); box-shadow:0 30px 70px rgba(2,6,23,0.6); }
+		.item-left{ display:flex; gap:12px; align-items:flex-start; max-width:68% }
+		.item-title{ font-weight:600; color:#fff; margin-bottom:6px; }
+		.item-meta{ color:var(--muted); font-size:0.85rem; }
+
+		/* priority badges */
+		.badge{ padding:6px 8px; border-radius:999px; font-weight:700; font-size:0.78rem; color:#04203a; }
+		.badge.low{ background:linear-gradient(90deg,#bbf7d0,#86efac); }
+		.badge.medium{ background:linear-gradient(90deg,#fef9c3,#fcd34d); }
+		.badge.high{ background:linear-gradient(90deg,#ffb4b4,#ff6b6b); color:#2b0202; }
+
+		/* progress/time bar */
+		.progress{ height:8px; border-radius:999px; background:rgba(255,255,255,0.03); overflow:hidden; width:180px; }
+		.progress > i{ display:block; height:100%; background:linear-gradient(90deg,var(--accentB),var(--accentA)); transition: width .4s ease; }
+
+		.realtime{ margin-top:12px; padding:12px; border-radius:10px; background: linear-gradient(90deg, rgba(124,108,255,0.06), rgba(45,212,191,0.03)); color:var(--muted); }
+
+		.planner{ display:flex; flex-direction:column; gap:12px; position:sticky; top:24px }
+		.free-slot{ padding:10px; border-radius:10px; background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); color:#eaf6ff }
+
+		.ai-console{ display:flex; flex-direction:column; gap:10px; margin-top:10px }
+		.ai-panel{ padding:12px; border-radius:12px; background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); }
+		.ai-history{ max-height:160px; overflow:auto; display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+		.ai-row{ padding:8px 10px; border-radius:10px; background:rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.02); font-size:0.9rem; color:var(--muted); }
+		.ai-row.ai-from-user{ background:linear-gradient(90deg, rgba(124,108,255,0.04), rgba(124,108,255,0.02)); color:#fff; align-self:flex-end }
+
+		.footer{ text-align:center; color:var(--muted); font-size:0.85rem; margin-top:6px }
+		.shimmer{ position:relative; overflow:hidden } .shimmer::after{ content:""; position:absolute; left:-120%; top:0; width:40%; height:100%; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent); animation: shimmer 4s linear infinite; }
+		@keyframes shimmer{ 0%{left:-120%}50%{left:120%}100%{left:120%} }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<!-- HERO -->
+		<section class="hero">
+			<div>
+				<h1 class="h-title shimmer">Student Life Optimizer — AI ผู้ช่วยจัดการชีวิตนักเรียน</h1>
+				<p class="h-sub">ระบบที่รวมการจัดตาราง การจัดลำดับการบ้าน การแนะนำเวลานอน และคำแนะนำ "ควรเริ่มเมื่อใด" แบบเรียลไทม์ — ให้ Aurora ช่วยวางแผนให้คุณโฟกัสด้านสำคัญ</p>
+
+				<div class="cta-row">
+					<button class="btn" onclick="document.getElementById('taskForm').scrollIntoView({behavior:'smooth'})">เพิ่มการบ้าน</button>
+					<button class="btn secondary" onclick="document.getElementById('compute').click()">คำนวณแผน</button>
+					<button class="btn ghost" onclick="document.getElementById('sleepRecBtn').click()">แนะนำเวลานอน</button>
+				</div>
+
+				<div style="margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+					<div class="help">Tip: เริ่มจากงานที่สำคัญที่สุด 15 นาทีเพื่อสร้างโมเมนตัม</div>
+					<div class="help">Aurora พร้อมช่วยจัดแผนอัตโนมัติ ⚡</div>
+				</div>
+			</div>
+
+			<div class="hero-right">
+				<div class="stat"><h3 id="statTasks">0</h3><p>งานคงเหลือ</p></div>
+				<div class="stat"><h3 id="statFree">—</h3><p>ชั่วโมงว่าง (7 วัน)</p></div>
+
+				<div class="ai-panel card" style="padding:12px; margin-top:6px">
+					<div style="display:flex; gap:10px; align-items:center">
+						<div style="width:56px; height:56px; border-radius:12px; background:linear-gradient(90deg,var(--accentB),var(--accentA)); display:grid; place-items:center; font-weight:700; color:#04203a">A</div>
+						<div style="flex:1">
+							<div style="font-weight:700; color:#fff">Aurora — AI Assistant</div>
+							<div style="font-size:0.9rem; color:var(--muted)">เสนอแผน แนะนำเวลา และรีคอมเมนเดชันแบบคอนเท็กซ์</div>
+						</div>
+					</div>
+					<div class="ai-console">
+						<div style="display:flex; gap:8px; margin-top:10px">
+							<button class="btn secondary" id="aiAutoPlan">จัดแผนอัตโนมัติ</button>
+							<button class="btn" id="aiReprio">เรียงลำดับใหม่ (AI)</button>
+							<button class="btn ghost" id="aiExplain">ให้เหตุผลการจัด</button>
+						</div>
+						<div class="ai-history" id="aiHistory" aria-live="polite"></div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- CONTENT GRID -->
+		<div class="grid">
+			<!-- left -->
+			<div>
+				<section class="card" id="classes">
+					<h2><span class="h-icon">📚</span> ตารางเรียน</h2>
+
+					<form id="classForm">
+						<input class="input" name="name" placeholder="ชื่อวิชา (ตัวอย่าง: ฟิสิกส์ 101)" required />
+						<input class="input" name="day" placeholder="วัน (Mon/Tue/... หรือ จันทร์)" required />
+						<input class="input" name="start" type="time" required />
+						<input class="input" name="end" type="time" required />
+						<button type="submit" class="btn">เพิ่มคาบ</button>
+					</form>
+					<div class="help">เพิ่มคาบเพื่อให้ระบบหา 'ช่วงว่าง' อัตโนมัติ (พิจารณา 7 วันถัดไป)</div>
+
+					<div class="list" id="classList"></div>
+				</section>
+
+				<section class="card" id="tasks">
+					<h2><span class="h-icon">📝</span> การบ้าน / งาน</h2>
+
+					<form id="taskForm">
+						<input class="input" name="title" placeholder="ตัวอย่าง: รายงานกลุ่ม — วิเคราะห์ข้อมูล" required />
+						<input class="input" name="est" type="number" min="0.1" step="0.1" placeholder="เวลาประเมิน (ชม.)" required />
+						<input class="input" name="deadline" type="datetime-local" required />
+						<button type="submit" class="btn">เพิ่มงาน</button>
+					</form>
+					<div class="help">กรอกเวลาโดยประมาณ (ชั่วโมง) เพื่อให้ระบบจัดลำดับและแนะนำเวลาที่ควรเริ่ม</div>
+
+					<div id="realtimeSuggestion" class="realtime">เลือกงานแล้วกด "เสนอเวลา" เพื่อให้ Aurora วิเคราะห์และแนะนำจังหวะเริ่มแบบเรียลไทม์</div>
+					<div class="list" id="taskList"></div>
+				</section>
+			</div>
+
+			<!-- right -->
+			<aside class="planner">
+				<section class="card">
+					<h2><span class="h-icon">🗓️</span> แผน & ช่วงว่าง</h2>
+					<button id="compute" class="btn" style="width:100%">คำนวณช่วงว่าง & แผน</button>
+					<div id="freeSlots" style="margin-top:12px"></div>
+					<div class="help">ระบบจะสแกนตารางเรียนและเสนอช่วงที่เหมาะสำหรับทำการบ้าน พร้อมคำแนะนำการพัก</div>
+				</section>
+
+				<section class="card">
+					<h2><span class="h-icon">🌙</span> แนะนำเวลานอน</h2>
+					<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+						<label style="color:var(--muted)">เวลาตื่น: <input id="wakeTime" class="input" type="time" value="07:00"/></label>
+						<button id="sleepRecBtn" class="btn secondary">คำนวณ</button>
+					</div>
+					<div id="sleepRecommendation" class="help" style="margin-top:12px">กดคำนวณเพื่อรับคำแนะนำเวลานอนที่สอดคล้องกับงานที่เหลือ</div>
+				</section>
+
+				<section class="card">
+					<h2><span class="h-icon">⚡</span> เคล็ดลับ & Shortcuts</h2>
+					<ul style="margin:10px 0 0 0; padding:0; list-style:none; color:var(--muted)">
+						<li style="margin:8px 0">• เริ่ม 15 นาทีแรกเพื่อสร้าง momentum</li>
+						<li style="margin:8px 0">• ใช้ Pomodoro 25/5 สำหรับงานที่ต้องใช้ความคิดชัดเจน</li>
+						<li style="margin:8px 0">• Aurora สามารถจัดแผนจำนวนชั่วโมงต่อวันให้คุณอัตโนมัติ</li>
+					</ul>
+				</section>
+			</aside>
+		</div>
+
+		<div class="footer">Student Life Optimizer — Aurora AI • ทำทีละน้อย แต่ไปไกล</div>
+	</div>
+
+	<!-- Bridge JS: keep minimal, expose hooks for app.js and enhance display -->
+	<script>
+		// preserve updateHeroStats for app.js
+		window.updateHeroStats = function(taskCount, freeHours){
+			const st = document.getElementById('statTasks'); if(st) st.textContent = String(taskCount || 0);
+			const sf = document.getElementById('statFree'); if(sf) sf.textContent = (typeof freeHours === 'number' ? freeHours.toFixed(1) : '—');
+		};
+
+		// small AI action bindings (will call into app.js hooks if available)
+		document.getElementById('aiAutoPlan').addEventListener('click', () => {
+			if(window.computeAutoPlan) { window.computeAutoPlan(); appendAIHistory('ขอให้ Aurora จัดแผนอัตโนมัติ...'); return; }
+			document.getElementById('compute').click();
+			appendAIHistory('เรียกคำนวณแผนโดย Aurora');
+		});
+		document.getElementById('aiReprio').addEventListener('click', () => {
+			if(window.aiReprioritize) { window.aiReprioritize(); appendAIHistory('เรียงลำดับใหม่โดย Aurora'); return; }
+			appendAIHistory('Aurora: ลองรีเรียงตาม deadline/est');
+			alert('Aurora: ฟีเจอร์ Re-prioritize ยังต้องการการเชื่อมต่อ (app.js)');
+		});
+		document.getElementById('aiExplain').addEventListener('click', () => {
+			appendAIHistory('Aurora: ให้เหตุผลการจัดลำดับ (ตัวอย่าง)');
+			if(window.aiExplainPlan) return window.aiExplainPlan();
+			// fallback: show generic explanation
+			const msg = 'Aurora: งานที่มี deadline ใกล้และเวลาประเมินมาก จะได้รับความสำคัญสูง — แนะนำแบ่งงานยาวเป็นช่วง';
+			appendAIHistory(msg, true);
+		});
+
+		// AI history helper
+		function appendAIHistory(text, isResponse=false){
+			const h = document.getElementById('aiHistory');
+			if(!h) return;
+			const el = document.createElement('div');
+			el.className = 'ai-row' + (isResponse ? '' : ' ai-from-user');
+			el.textContent = text;
+			h.prepend(el);
+		}
+
+		// allow app.js to add rich task items: provide helper to render a task row
+		window.renderTaskRow = function({id, title, est, deadline, priority, createdAt}){
+			const list = document.getElementById('taskList');
+			if(!list) return;
+			const li = document.createElement('div');
+			li.className = 'list-item';
+			// human friendly deadline/time left
+			const dl = new Date(deadline);
+			const now = new Date();
+			const hoursLeft = Math.max(0, Math.round((dl - now)/36e5));
+			const prClass = priority >= 1.5 ? 'high' : (priority >= 0.4 ? 'medium' : 'low');
+			li.innerHTML = `
+				<div class="item-left">
+					<div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(90deg,var(--accentA),var(--accentB));display:grid;place-items:center;font-weight:700">${title[0] || 'T'}</div>
+					<div>
+						<div class="item-title">${escapeHtml(title)}</div>
+						<div class="item-meta">est ${est} ชม • เสร็จภายใน ${dl.toLocaleString()} • เหลือ ${hoursLeft} ชม</div>
+					</div>
+				</div>
+				<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+					<span class="badge ${prClass}">${prClass.toUpperCase()}</span>
+					<div style="display:flex;gap:8px;align-items:center">
+						<div class="progress" title="ความคืบหน้าโดยประมาณ"><i style="width:${Math.min(100, Math.round((1 - Math.min(hoursLeft/Math.max(est,0.1), 1)) * 100))}%"></i></div>
+						<button class="btn ghost" data-id="${id}" onclick="suggestForTask('${id}')">เสนอเวลา</button>
+					</div>
+				</div>
+			`;
+			list.prepend(li);
+		};
+
+		// small helper used by 'เสนอเวลา' buttons: call app.js computeStartSuggestion if available
+		function suggestForTask(id){
+			appendAIHistory('ผู้ใช้ขอให้ Aurora แนะนำเวลาเริ่มสำหรับงาน ' + id);
+			if(window.computeStartSuggestionForId){
+				const out = window.computeStartSuggestionForId(id);
+				appendAIHistory(out, true);
+				const el = document.getElementById('realtimeSuggestion');
+				if(el) el.textContent = out;
+				return;
+			}
+			// fallback: just show message
+			appendAIHistory('Aurora: ยังไม่สามารถคำนวณได้ — เชื่อมต่อกับ app.js', true);
+			alert('Aurora: เชื่อม app.js เพื่อรับคำแนะนำแบบเรียลไทม์');
+		}
+
+		// safe html escape
+		function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+
+		// expose small hooks used by app.js: if app.js sets window.onDataUpdated it will call our renderer
+		window.onDataUpdated = window.onDataUpdated || function(state){
+			// state {classes, tasks, freeSlotsSummaryHours}
+			try{
+				const cl = document.getElementById('classList'); if(cl){ cl.innerHTML=''; state.classes && state.classes.slice().reverse().forEach(c=>{
+					const d = document.createElement('div'); d.className='list-item'; d.innerHTML = `<div style="display:flex;gap:12px;align-items:center"><div style="width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.02);display:grid;place-items:center">${c.name[0]||'C'}</div><div><div style="font-weight:600;color:#fff">${escapeHtml(c.name)}</div><div class="item-meta">${escapeHtml(c.day)} ${c.start}-${c.end}</div></div></div><div class="item-meta">${escapeHtml(c.name)}</div>`; cl.appendChild(d);
+				}); }
+				// tasks: let app.js handle rendering via renderTaskRow or fallback to simple list
+				if(window.renderTaskRow && state.tasks){ document.getElementById('taskList').innerHTML=''; state.tasks.forEach(t=> window.renderTaskRow(t)); }
+				const sf = document.getElementById('statFree'); if(sf) sf.textContent = (typeof state.freeSlotsSummaryHours === 'number' ? state.freeSlotsSummaryHours.toFixed(1) : '—');
+				const st = document.getElementById('statTasks'); if(st) st.textContent = (state.tasks? state.tasks.length : 0);
+			}catch(e){ console.warn(e) }
+		};
+	</script>
+
+	<script src="app.js"></script>
+</body>
+</html>
